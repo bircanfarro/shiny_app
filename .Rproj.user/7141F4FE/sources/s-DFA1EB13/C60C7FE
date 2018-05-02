@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1524983851430.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C60C7FE",
+    "lastKnownWriteTime" : 1524983704,
+    "last_content_update" : 1524984986181,
+    "path" : "/_assets/projects/bircan/datacamp/shiny/dev/clean.R",
+    "project_path" : "clean.R",
+    "properties" : {
+        "cursorPosition" : "45,0",
+        "scrollLine" : "23"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

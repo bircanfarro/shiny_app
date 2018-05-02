@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1525230968201.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "51CE9560",
+    "lastKnownWriteTime" : 1525230568,
+    "last_content_update" : 1525230568,
+    "path" : "~/shiny_app_turkey_old/global.R",
+    "project_path" : "global.R",
+    "properties" : {
+        "cursorPosition" : "13,67",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

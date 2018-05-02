@@ -1,0 +1,145 @@
+library(tidyverse)
+library(data.table)
+library(dplyr)
+
+dir_data <- "/_assets/projects/bircan/datacamp/shiny/downloads"
+
+filename_as_monthly = "unhcr_popstats_export_asylum_seekers_monthly_2018_04_25_044318.csv"
+
+# unhcr_popstats_export_demographics_2018_04_25_043936.csv
+# unhcr_popstats_export_persons_of_concern_2018_04_25_043500.csv
+# unhcr_popstats_export_persons_of_concern_2018_04_25_043636.csv
+
+tmp_as_monthly = read.csv(paste(dir_data, filename_as_monthly, sep=" "),
+                      header = T, stringsAsFactors = F,  skip = 2)
+
+
+#1
+as_monthly = read.csv(paste(dir_data, filename_as_monthly, sep=" "),
+                       header = T, stringsAsFactors = F,  skip = 2)%>%
+  rename(., Country.Territory.of.Asylum.Residence = Country...territory.of.asylum.residence)
+
+
+
+# a.s.monthly = read.csv('unhcr_popstats_export_asylum_seekers_monthly_2018_04_25_044318.csv',
+#                        header = T, stringsAsFactors = F,  skip = 2)%>%
+#   rename(., Country.Territory.of.Asylum.Residence = Country...territory.of.asylum.residence)
+
+# a.s.monthly = read.csv('unhcr_popstats_export_asylum_seekers_monthly_2018_04_25_044318.csv',
+#                        header = T, stringsAsFactors = F,  skip = 2) %>% 
+#  setnames(c('Country...territory.of.asylum.residence'), c('Country/Territory.of.Asylum.Residence'))
+
+
+
+#a.s.monthly %>% setnames(c('Country...territory.of.asylum.residence'), c('Country.Territory.of.Asylum.Residence'))
+#  a.s.monthly %>% dplyr::rename(c( 'Country / territory of asylum/residence' = 'Country/Territory.of.Asylum.Residence'))
+# 
+#head(a.s.monthly)
+
+a.s.monthly = na.omit(a.s.monthly)
+a.s.monthly$Value = as.numeric(as.character(a.s.monthly$Value))
+
+as_by_country <- a.s.monthly %>%
+  select(Country.Territory.of.Asylum.Residence,Value) %>%
+  group_by(Country.Territory.of.Asylum.Residence) %>%
+  summarise(Total = sum(Value , na.rm = T ))
+
+as_by_country <- dplyr::arrange(as_by_country, -Total)
+
+# 
+# 
+# tm <- treemap(as_by_country, index = c(`Country/Territory.of.Asylum.Residence`),
+#               vSize = "Total", vColor = "Total",
+#               type = "value", palette = viridis(6))
+# 
+# hctreemap(tm)
+
+
+#2
+a.s.yearly = read.csv('unhcr_popstats_export_persons_of_concern_2018_04_25_043500.csv',
+                      header = T, stringsAsFactors = F, skip = 2) 
+
+a.s.by.year =  a.s.yearly [, !(colnames(a.s.yearly) %in% c("Internally.displaced.persons..IDPs."))] %>%
+  rename ( Refugees = Refugees..incl..refugee.like.situations., 
+           Country.Territory.of.Asylum.Residence = Country...territory.of.asylum.residence,
+           Asylum.Seekers_Pending.Cases = Asylum.seekers..pending.cases.,
+           Returned.Refugees = Returned.refugees)
+
+
+
+
+
+
+
+by_country = a.s.by.year %>% group_by(`Country.Territory.of.Asylum.Residence`) %>%
+  summarise( Refugees, Returned.Refugees)
+
+
+
+#3
+
+ref.by.year = read.csv('unhcr_popstats_export_persons_of_concern_2018_04_25_043636.csv',
+                       header = T, sep = ",", dec = ".", fill = TRUE, skip = 2) %>%
+  rename(., Country.Territory.of.Asylum.Residence = Country...territory.of.asylum.residence)
+rename( c( "Refugees..incl..refugee.like.situations." = "Refugees",
+           'Asylum.seekers..pending.cases.' = 'Asylum.Seekers/Pending.Cases', 
+           'Country...territory.of.asylum.residence' = 'Country/Territory.of.Asylum.Residence'))
+
+
+
+
+
+
+#4
+ref.by.demograph = read.csv('unhcr_popstats_export_demographics_2018_04_25_043936.csv', 
+                            header = T, sep = ",", dec = ".", fill = TRUE, skip = 2)
+
+#ref.by.demograph = na.omit(ref.by.demograph)
+ref.by.demograph$Female.0.4 = as.numeric(as.character(ref.by.demograph$Female.0.4))
+ref.by.demograph$Female.5.11 = as.numeric(as.character(ref.by.demograph$Female.5.11))
+ref.by.demograph$Female.12.17 = as.numeric(as.character(ref.by.demograph$Female.12.17))
+ref.by.demograph$Female.5.17 = as.numeric(as.character(ref.by.demograph$Female.5.17))
+
+
+
+ref.by.demograph$Male.0.4 = as.numeric(as.character(ref.by.demograph$Male.0.4))
+ref.by.demograph$Male.5.11 = as.numeric(as.character(ref.by.demograph$Male.5.11))
+ref.by.demograph$Male.12.17 = as.numeric(as.character(ref.by.demograph$Male.12.17))
+ref.by.demograph$Male.5.17 = as.numeric(as.character(ref.by.demograph$Male.5.17))
+
+
+ref.by.demograph$Location.Name = as.character(ref.by.demograph$Location.Name)
+a = (sapply (ref.by.demograph$Location.Name, strsplit, split=':', fixed=TRUE))
+
+print(lapply(a, function(x){return(x[[1]][1])}))
+print(ref.by.demograph$Female.0.4)
+ref.by.demograph$Location.Name = sapply(a, function(x){return(x[[1]][1])})
+
+
+
+
+
+ref.by.demograph <- ref.by.demograph %>% group_by(Location.Name, Year) %>%
+  mutate(Female.0.17 = sum(c(Female.0.4, Female.5.17), na.rm = T, dims = 1L))
+# Male.0.17 = sum(c(Male.0.4, Male.5.17), na.rm = T, dims = 1L)) 
+
+
+
+ref.by.demograph = ref.by.demograph[, !(colnames(ref.by.demograph) %in% c("F..Unknown","M..Unknown", "Female.0.4", 
+                                                                          "Female.5.11", "Female.5.17", "Female.12.17", "Male.0.4",
+                                                                          "Male.5.11", "Male.5.17", "Male.12.17"))] %>%
+  rename(., Country.Territory.of.Asylum.Residence = Country...territory.of.asylum.residence)
+
+
+
+ref.by.demograph <- ref.by.demograph %>% group_by(Location.Name, Year) %>%
+  mutate(Female.0.17 = sum(c(Female.0.4, Female.5.17), na.rm = T, dims = 1L))
+
+
+
+# ref.by.demograph$Location.Name = as.character(ref.by.demograph$Location.Name)
+# a = sapply (ref.by.demograph$Location.Name, strsplit, split=':', fixed=TRUE)
+# 
+# tail(a)
+# unlist(tail(a))
+# b = lapply(a, function(x){return(x[[1]][1])})
